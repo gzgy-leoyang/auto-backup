@@ -107,7 +107,7 @@ echo "======================="
 ########
 sync
 sync
-echo SYNC
+echo "Auto save completed"
 # umount /dev/sda1
 echo UMOUNT...
 # sudo eject /dev/sda
