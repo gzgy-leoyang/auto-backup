@@ -16,8 +16,61 @@ refresh_file=0
 add_new_dir=0
 loop=0
 
-# 空格表
-string='                                            '
+# 空格表 ###
+string='                                            ' ####
+######
+
+usb_storage_path="/proc/scsi/"
+
+declare -a usb_dev_list
+declare -i usb_dev_counter
+
+
+# 通过 /sys/class/scsi_device/xxxxx/device/sdx/removable 确认 sdx 盘符
+# 如果存在多个 U盘，记录每一个盘符
+find_usb_device(){
+
+    for usb_dev_file in `ls -l $usb_device_path`
+    do
+        if [ x"$usb_dev_file" != x"." -a x"$usb_dev_file" != x".." ];then
+            if [ -d "$usb_device_path/$usb_dev_file/device/block" ];then
+                echo "USB : $usb_device_path/$usb_dev_file/device/block"
+                for sd_file in `ls $usb_device_path/$usb_dev_file/device/block`
+                do
+                    echo "sd*: $sd_file"
+                    if [ -f "$usb_device_path/$usb_dev_file/device/block/$sd_file/removable" ];then
+                        echo "sd*: removeable"
+                        usb_dev_file[$usb_dev_counter]="$sd_file"
+                        ((usb_dev_counter=usb_dev_counter+1))
+                    fi
+                done
+            fi
+        fi
+    done
+    return 
+}
+
+# 首先，通过 /proc/scsi/usb-storage 确认是否有 u盘 插入
+# 再进一步确认插入 U盘 的具体文件
+find_usb_storage(){
+
+    if [ -d "$usb_storage_path/usb-storage" ];then
+        echo "Found usb-storage"
+        find_usb_device
+        # return
+    else
+        echo "No usb-device"
+    fi  
+
+    return 
+}
+
+usb_device_path="/sys/class/scsi_device"
+
+
+#find_usb_storage 
+
+
 
 find_new_file(){
     local working_path="$1"
