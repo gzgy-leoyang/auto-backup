@@ -1,0 +1,17 @@
+usb设备的检测及区分(sata硬盘、优盘及移动硬盘)
+
+1.如果有外置usb设备插入，会产生/proc/scsi/usb-storage目录(ide硬盘上默认
+没有)，并且会在/proc/scsi/usb-storage目录中产生数字文件，此文件存储了设
+备的相关信息。
+2./sys/class/scsi_device/目录中会有几个scsi设备的目录，以数字开头。(ide
+中默认无子目录，sata硬盘默认有子目录),类似1:0:0或2:0:0,开头的数字,这个数
+字与/proc/scsi/usb-storage目录中的相对应，另外的子目录表示sata硬盘。
+3.在/sys/class/scsi_device/数字开头的目录/device/目录下以block开头的目录
+中(可能为block或block:sda或block:sdb或block:scr等,总之这里只有一个以
+block开头的目录）有两个文件：
+removeable和dev.
+removeable的内容为0或1,可以区分优盘或移动硬盘。
+dev的内容类似8:16，就是/proc/partitions中设备的maj:min的值。
+
+据此，先看usb-storage目录，再到/sys目录下找相应的removable和dev文件，再
+查partitions文件，就可以得到设备名、设备信息、可移动标记。
